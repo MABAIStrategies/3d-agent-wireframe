@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAB AI Strategies - Interactive 3D Tech Stack Wireframe</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030014;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030014;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a1b54;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #44337a;
+        }
+        /* Glowing Glassmorphism */
+        .glass-panel {
+            background: rgba(10, 5, 30, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+        }
+        .glow-indigo {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
+        }
+        .active-tab {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(99, 102, 241, 0.15) 100%);
+            border-color: rgba(139, 92, 246, 0.6);
+            color: #ffffff;
+        }
+        /* Visual cues for mobile tap target sizes */
+        .touch-target {
+            min-width: 44px;
+            min-height: 44px;
+        }
+        /* Custom Loading Spinner */
+        .sparkle-spinner {
+            border: 2px solid rgba(167, 139, 250, 0.1);
+            border-top: 2px solid #a78bfa;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="w-full h-screen relative flex select-none">
+
+    <!-- TOP HEADER / BRANDING -->
+    <header class="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 md:p-6 pointer-events-none">
+        <div class="flex items-center gap-3 pointer-events-auto bg-[#030014]/80 p-3 rounded-2xl border border-violet-500/10 backdrop-blur-md">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                <i class="fa-solid fa-cubes text-white text-lg animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-base md:text-lg font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-200">MAB AI STRATEGIES</h1>
+                <p class="text-[10px] text-violet-400/80 tracking-widest uppercase mono">Interactive 3D Tech Stack v3.0</p>
+            </div>
+        </div>
+        
+        <div class="pointer-events-auto flex gap-2">
+            <button onclick="resetCamera()" class="touch-target px-4 bg-violet-950/40 hover:bg-violet-900/40 border border-violet-500/30 text-xs text-violet-300 rounded-xl flex items-center gap-2 transition duration-200 backdrop-blur-md">
+                <i class="fa-solid fa-video"></i> <span class="hidden md:inline">Reset View</span>
+            </button>
+            <button onclick="togglePipelineSim()" id="simBtn" class="touch-target px-4 bg-emerald-950/40 hover:bg-emerald-900/40 border border-emerald-500/30 text-xs text-emerald-300 rounded-xl flex items-center gap-2 transition duration-200 backdrop-blur-md">
+                <i class="fa-solid fa-circle-play animate-pulse"></i> <span>Simulate Flow</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN 3D CANVAS -->
+    <div id="canvas-container" class="w-full h-full absolute inset-0 z-10 cursor-grab active:cursor-grabbing"></div>
+
+    <!-- LEFT DRAWER: ARCHITECTURE EXPLORER & ✨ GEMINI AI WORKSPACE -->
+    <aside class="absolute left-0 top-24 bottom-4 w-full md:w-[390px] px-4 z-40 pointer-events-none flex flex-col gap-4">
+        
+        <!-- Tab Selectors for Left Side Control -->
+        <div class="pointer-events-auto flex gap-1 bg-[#0a051e]/90 p-1.5 rounded-2xl border border-violet-500/10 backdrop-blur-md">
+            <button id="tabBtn-layers" onclick="switchLeftTab('layers')" class="flex-1 py-2 text-xs font-semibold rounded-xl text-center transition duration-150 active-tab">
+                <i class="fa-solid fa-layer-group mr-1.5"></i>Layers
+            </button>
+            <button id="tabBtn-gemini" onclick="switchLeftTab('gemini')" class="flex-1 py-2 text-xs font-semibold rounded-xl text-center transition duration-150 text-violet-300/60 hover:text-white">
+                <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>✨ Gemini Hub
+            </button>
+        </div>
+
+        <!-- TAB CONTENT: 1. STACK ARCHITECTURE LAYERS -->
+        <div id="leftTab-layers" class="pointer-events-auto glass-panel rounded-2xl p-4 flex flex-col gap-3 max-h-[40%] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-violet-500/10 pb-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-violet-400">Stack Architecture Layers</span>
+                <span id="nodesCount" class="text-[10px] mono bg-violet-500/20 px-2 py-0.5 rounded text-violet-200">25 Nodes Active</span>
+            </div>
+            
+            <div class="flex flex-col gap-1.5">
+                <!-- Layer 4 -->
+                <button onclick="focusLayer(4)" id="layerBtn-4" class="touch-target flex items-center justify-between p-2 rounded-xl border border-violet-500/10 hover:border-violet-500/40 text-left transition duration-200 bg-violet-950/10 text-violet-300/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                        <span class="text-xs font-medium">1. Orchestration & Agents</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+                <!-- Layer 3 -->
+                <button onclick="focusLayer(3)" id="layerBtn-3" class="touch-target flex items-center justify-between p-2 rounded-xl border border-violet-500/10 hover:border-violet-500/40 text-left transition duration-200 bg-violet-950/10 text-violet-300/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-fuchsia-400"></span>
+                        <span class="text-xs font-medium">2. Brain & Cognitive Models</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+                <!-- Layer 2 -->
+                <button onclick="focusLayer(2)" id="layerBtn-2" class="touch-target flex items-center justify-between p-2 rounded-xl border border-violet-500/10 hover:border-violet-500/40 text-left transition duration-200 bg-violet-950/10 text-violet-300/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                        <span class="text-xs font-medium">3. Routers & Inference</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+                <!-- Layer 1 -->
+                <button onclick="focusLayer(1)" id="layerBtn-1" class="touch-target flex items-center justify-between p-2 rounded-xl border border-violet-500/10 hover:border-violet-500/40 text-left transition duration-200 bg-violet-950/10 text-violet-300/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+                        <span class="text-xs font-medium">4. Memory & Context Retrieval</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+                <!-- Layer 0 -->
+                <button onclick="focusLayer(0)" id="layerBtn-0" class="touch-target flex items-center justify-between p-2 rounded-xl border border-violet-500/10 hover:border-violet-500/40 text-left transition duration-200 bg-violet-950/10 text-violet-300/80">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                        <span class="text-xs font-medium">5. Persistence & Infrastructure</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: 2. ✨ GEMINI AI WORKSPACE HUB -->
+        <div id="leftTab-gemini" class="hidden pointer-events-auto glass-panel rounded-2xl p-4 flex flex-col gap-4 overflow-y-auto max-h-[60%]">
+            <div class="border-b border-violet-500/15 pb-2">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-violet-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-violet-400 animate-pulse"></i>
+                    ✨ Custom AI Simulation Builder
+                </span>
+                <p class="text-[10px] text-gray-400 mt-1">Prompt Gemini to construct an interactive, custom 3D system pipeline using your active components.</p>
+            </div>
+
+            <!-- Custom Scenario Form -->
+            <div class="flex flex-col gap-3">
+                <label class="text-[11px] font-bold text-gray-300">Describe Your Business Automation Case:</label>
+                <textarea id="geminiPromptInput" rows="3" class="w-full bg-[#120a2a] border border-violet-500/20 rounded-xl p-2.5 text-xs text-gray-200 focus:outline-none focus:border-violet-400 placeholder-gray-500" placeholder="e.g. When Claude Code merges a branch to GitHub, sync SQLite and broadcast to Slack..."></textarea>
+                
+                <button onclick="synthesizePipeline()" id="synthesizeBtn" class="touch-target w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition duration-150 shadow-md shadow-indigo-950/40">
+                    <i id="synthesizeIcon" class="fa-solid fa-microchip"></i>
+                    <span id="synthesizeBtnText">✨ Design & Generate 3D Sim</span>
+                </button>
+            </div>
+
+            <!-- System Message Alert / Processing State -->
+            <div id="geminiAlert" class="hidden bg-indigo-950/40 border border-indigo-500/30 p-3 rounded-xl flex items-start gap-2.5">
+                <div id="geminiAlertSpinner" class="sparkle-spinner flex-shrink-0 mt-0.5"></div>
+                <div class="flex-1">
+                    <p id="geminiAlertTitle" class="text-xs font-bold text-indigo-300">Architecting Scenario...</p>
+                    <p id="geminiAlertDesc" class="text-[10px] text-gray-300 mt-0.5">Gemini is arranging optimal nodes for logical flow consistency.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Workflow Simulation Active State -->
+        <div id="simulationPanel" class="pointer-events-auto glass-panel rounded-2xl p-4 flex flex-col gap-2 opacity-0 transform translate-y-4 pointer-events-none transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping absolute"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 relative"></span>
+                    Active Data Sim Pipeline
+                </span>
+                <button onclick="togglePipelineSim()" class="text-xs text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex flex-col gap-2 mt-2">
+                <div class="bg-emerald-950/30 border border-emerald-500/20 p-2.5 rounded-xl">
+                    <p class="text-[11px] font-semibold text-emerald-300" id="simName">Feature Rollout Blueprint</p>
+                    <p class="text-[10px] text-emerald-400/80 mt-1" id="simDesc">Initiating webhook connection across core nodes...</p>
+                </div>
+                
+                <div class="flex flex-col gap-2 mt-1" id="simStepsContainer">
+                    <div class="flex items-center gap-2 text-[10px] mono" id="step1">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">1</span>
+                        <span class="text-gray-300">Trigger: Zapier MCP Integration Sync</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] mono opacity-40 transition-all duration-300" id="step2">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">2</span>
+                        <span class="text-gray-300">Evaluate Context: Cerebras / Groq Routers</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] mono opacity-40 transition-all duration-300" id="step3">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">3</span>
+                        <span class="text-gray-300">Orchestrate Code: Claude Code Agent Engine</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] mono opacity-40 transition-all duration-300" id="step4">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">4</span>
+                        <span class="text-gray-300">Log Memory Context: Obsidian Vector Store</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] mono opacity-40 transition-all duration-300" id="step5">
+                        <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">5</span>
+                        <span class="text-gray-300">Deploy Changes: Neon DB & Vercel Hosting</span>
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 mt-2">
+                    <button id="nextSimBtn" onclick="cyclePipeline()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-1.5 px-3 rounded-lg text-[10px] transition duration-150">
+                        Next Pipeline Scenario
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- RIGHT DRAWER: DETAILED INFORMATION NODE OVERLAY & ✨ AI CONSULTANT CHAT -->
+    <main id="nodeDetailDrawer" class="absolute right-0 top-24 bottom-4 w-full md:w-[430px] px-4 z-40 pointer-events-none flex flex-col justify-end md:justify-start">
+        <div class="pointer-events-auto glass-panel rounded-2xl p-5 flex flex-col gap-4 overflow-y-auto max-h-[85vh] transition-all duration-300 transform translate-x-full" id="drawerBody">
+            <!-- Header containing current node details -->
+            <div class="flex items-start justify-between border-b border-violet-500/10 pb-4">
+                <div class="flex items-center gap-3">
+                    <div id="nodeIconBox" class="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-xl text-violet-300 border border-violet-500/20">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-extrabold text-white" id="nodeTitle">Select a Node</h2>
+                        <span class="text-[10px] uppercase tracking-widest mono text-violet-400/80" id="nodeCategory">Layer Info</span>
+                    </div>
+                </div>
+                <button onclick="closeDrawer()" class="text-gray-400 hover:text-white transition duration-150 touch-target p-1">
+                    <i class="fa-solid fa-circle-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Tab Selectors for Node Info vs. ✨ Advisor Chat -->
+            <div class="flex gap-1 bg-[#0a051e]/60 p-1 rounded-xl border border-violet-500/5">
+                <button id="nodeSubTabBtn-spec" onclick="switchNodeSubTab('spec')" class="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-center transition duration-150 bg-violet-500/15 border border-violet-500/20 text-white">
+                    <i class="fa-solid fa-circle-info mr-1"></i>Component Spec
+                </button>
+                <button id="nodeSubTabBtn-consult" onclick="switchNodeSubTab('consult')" class="flex-1 py-1.5 text-[11px] font-semibold rounded-lg text-center transition duration-150 text-violet-300/60 hover:text-white">
+                    <i class="fa-solid fa-user-tie mr-1"></i>✨ Consult Advisor
+                </button>
+            </div>
+
+            <!-- TAB CONTAINER: SPEC INFO -->
+            <div id="nodeSubTab-spec" class="flex flex-col gap-4">
+                <!-- Metadata parameters -->
+                <div class="grid grid-cols-2 gap-3" id="metaContainer">
+                    <div class="bg-[#120a2a]/60 border border-violet-500/5 p-2.5 rounded-xl">
+                        <p class="text-[9px] uppercase tracking-wider text-gray-400 font-semibold">Operational Status</p>
+                        <p class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Online / Synced
+                        </p>
+                    </div>
+                    <div class="bg-[#120a2a]/60 border border-violet-500/5 p-2.5 rounded-xl">
+                        <p class="text-[9px] uppercase tracking-wider text-gray-400 font-semibold">Data Access Tier</p>
+                        <p class="text-xs font-bold text-indigo-300 mt-0.5" id="nodeType">Unified API</p>
+                    </div>
+                </div>
+
+                <!-- Summary & Description -->
+                <div class="flex flex-col gap-1.5">
+                    <span class="text-xs font-semibold text-violet-300/80">Description & Context</span>
+                    <p class="text-xs leading-relaxed text-gray-300" id="nodeDesc">
+                        Select any functional component block in the 3D grid layout to inspect integration protocols, memory sync routines, and automated business parameters.
+                    </p>
+                </div>
+
+                <!-- Inter-Node Workflows / Connections -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs font-semibold text-violet-300/80">Active Dynamic Connections</span>
+                    <div class="flex flex-wrap gap-2" id="nodeConnections">
+                        <span class="text-[10px] bg-[#120a2a] px-2.5 py-1 rounded-lg border border-violet-500/10 text-gray-400">No node selected</span>
+                    </div>
+                </div>
+
+                <!-- Strategic Business Improvement Actions -->
+                <div class="flex flex-col gap-2 mt-2 pt-4 border-t border-violet-500/10" id="actionContainer">
+                    <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line text-[10px]"></i> System Enhancements (Added)
+                    </span>
+                    <div class="bg-emerald-950/10 border border-emerald-500/10 p-3 rounded-xl">
+                        <p class="text-[11px] font-bold text-emerald-300" id="actionTitle">MAB AI System Enhancement</p>
+                        <p class="text-[10px] text-gray-300 mt-1" id="actionDesc">Click a node to view proactive infrastructure additions and workflow automations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB CONTAINER: ✨ GEMINI ADVISOR CHAT -->
+            <div id="nodeSubTab-consult" class="hidden flex flex-col gap-3">
+                <div class="bg-[#120a2a]/60 border border-violet-500/15 p-3 rounded-xl">
+                    <div class="flex items-center gap-1.5 text-xs text-violet-300 font-bold mb-1">
+                        <i class="fa-solid fa-brain"></i> Contextual Knowledge base
+                    </div>
+                    <p class="text-[11px] text-gray-400">Gemini knows this stack, the available libraries, and can draft instant code files, deployment commands, or architecture pattern checklists.</p>
+                </div>
+
+                <!-- Chat Box Screen -->
+                <div id="advisorChatHistory" class="bg-[#050117] border border-violet-500/10 rounded-xl p-3 h-[220px] overflow-y-auto flex flex-col gap-2">
+                    <div class="bg-violet-950/20 border border-violet-500/10 p-2.5 rounded-xl text-xs text-gray-300">
+                        <span class="font-bold text-violet-400 block mb-0.5">✨ Gemini Advisor:</span>
+                        Hi, ask me anything about optimizing, programing, or hardening your <b id="chatSelectedNodeName">node</b> infrastructure.
+                    </div>
+                </div>
+
+                <!-- Chat inputs -->
+                <div class="flex gap-2">
+                    <input type="text" id="advisorChatInput" onkeydown="if(event.key==='Enter') sendAdvisorMessage()" class="flex-1 bg-[#120a2a] border border-violet-500/20 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-violet-400 placeholder-gray-500" placeholder="e.g. Give me integration code...">
+                    <button onclick="sendAdvisorMessage()" id="chatSendBtn" class="touch-target px-4 bg-gradient-to-tr from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 rounded-xl text-xs font-bold text-white flex items-center justify-center transition duration-150">
+                        ✨ Ask
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- INSTRUCTIONS / ROTATION HELPER OVERLAY (Disappears on hover/interaction) -->
+    <div id="instructionOverlay" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center justify-center text-center gap-1 transition-all duration-500 bg-[#0c0525]/80 px-6 py-3 rounded-2xl border border-violet-500/20 backdrop-blur-md">
+        <div class="flex items-center gap-2 text-violet-300 text-xs font-semibold">
+            <i class="fa-solid fa-circle-nodes text-sm animate-pulse"></i>
+            <span>Interactive 3D Workspace Architecture</span>
+        </div>
+        <p class="text-[10px] text-gray-400">Left Click + Drag to Rotate • Right Click + Drag to Pan • Scroll to Zoom • Click Nodes to Inspect</p>
+    </div>
+
+    <!-- AUDIO PLAYER ELEMENT (Optional feedback) -->
+    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+
+    <script>
+        // -------------------------------------------------------------
+        // NODE DATA ARCHITECTURE (Derived from wireframe hand-drawn sketches)
+        // -------------------------------------------------------------
+        const techStackData = [
+            // Layer 4: Orchestration & Agents (Top Level Y=10)
+            {
+                id: 'hermes', name: 'Hermes', layer: 4, gridX: -3, gridZ: -2,
+                category: 'Agents', type: 'Open Code Agent Orchestrator', icon: 'fa-robot',
+                desc: 'Highly functional local autonomous agent optimized for task orchestration and reasoning pathways. Serves as a dynamic routing model.',
+                connections: ['claude_code', 'zapier_mcp', 'obsidian'],
+                action: 'Orchestrator sync',
+                actionDesc: 'Implemented deep-level custom prompt system routing tasks directly via standard tools or custom webhooks.'
+            },
+            {
+                id: 'claude_code', name: 'Claude Code', layer: 4, gridX: -1, gridZ: -2,
+                category: 'Agents', type: 'System Level LLM Coder', icon: 'fa-code',
+                desc: 'Next-gen command-line terminal workspace agent that writes, tests, and deploys production-grade business platforms with native system access.',
+                connections: ['hermes', 'github', 'vercel', 'neon'],
+                action: 'GitHub CI/CD Automation',
+                actionDesc: 'Configured automated trigger workflows; Claude Code acts as a pre-merge reviewer validation step for high compliance.'
+            },
+            {
+                id: 'grok_build', name: 'Grok Build', layer: 4, gridX: 1, gridZ: -2,
+                category: 'Agents', type: 'Context Build Orchestration', icon: 'fa-hammer',
+                desc: 'Powerful operational agent built specifically to compile and parse dynamic system repositories and complex real-time codebase connections.',
+                connections: ['github', 'open_router', 'cloud_drive'],
+                action: 'Automated Repository Parsing',
+                actionDesc: 'Configured automatic indexing pipelines to vectorise active repository documentation changes instantly.'
+            },
+            {
+                id: 'linear', name: 'Linear (Custom Integration)', layer: 4, gridX: 3, gridZ: 1,
+                category: 'Design & Project Management', type: 'Automated Workflow Engine', icon: 'fa-circle-nodes',
+                desc: 'Core issue tracking and workflow engine. Modified with custom endpoints to sync programmatic agent outputs with user management pipelines.',
+                connections: ['claude_code', 'zapier_mcp', 'slack'],
+                action: 'Dynamic Ticket Provisioning',
+                actionDesc: 'Agents now auto-generate tickets on failure, providing absolute diagnostic clarity with logs attached.'
+            },
+            {
+                id: 'figma_canva', name: 'Figma & Canva', layer: 4, gridX: 1, gridZ: 1,
+                category: 'Design & Project Management', type: 'UX & Design Visual Layouts', icon: 'fa-pen-nib',
+                desc: 'High-fidelity workspace layouts, UX blueprints, and visual presentation systems connected dynamically through content endpoints.',
+                connections: ['google_drive', 'zapier_mcp'],
+                action: 'Design Asset Automation Sync',
+                actionDesc: 'Configured automated export of approved Figma mockups into local dev directories through design tokens.'
+            },
+
+            // Layer 3: Cognitive Brain & Models Layer (Y=5)
+            {
+                id: 'closed_models', name: 'Closed Models', layer: 3, gridX: -2.5, gridZ: -2,
+                category: 'Brain & Models', type: 'Proprietary APIs (Paid/Pro)', icon: 'fa-brain',
+                desc: 'Includes commercial APIs: GPT-4o (Paid Plus), Claude 3.5 Sonnet (Pro), Gemini 1.5 Pro, and Super Grok. Provides supreme logical thinking and context parsing.',
+                connections: ['open_router', 'zapier_mcp', 'obsidian'],
+                action: 'Observability & Token Optimization',
+                actionDesc: 'Implemented smart context trimming and Langfuse caching layer, dropping API expenditures by up to 34%.'
+            },
+            {
+                id: 'open_models', name: 'Open Models', layer: 3, gridX: -0.5, gridZ: -2,
+                category: 'Brain & Models', type: 'Open Weights Models', icon: 'fa-microchip',
+                desc: 'Local and open weights platforms: Kimi 2.6, Kimi 2.7 Coder, Deepseek V4 Pro, and GLM 5.2. Allows high customizability and robust fine-tuning setups.',
+                connections: ['ollama', 'cerebras', 'groq', 'offline_toshiba'],
+                action: 'Secure On-Prem Host Architecture',
+                actionDesc: 'Set up dynamic model fallback routines. When local processing limits are hit, tasks gracefully roll over to Cerebras.'
+            },
+            {
+                id: 'zapier_mcp', name: 'Zapier MCP Integration', layer: 3, gridX: 2, gridZ: -2,
+                category: 'Integrations & MCP', type: 'Model Context Protocol Gate', icon: 'fa-plug',
+                desc: 'Model Context Protocol server linked with Zapier. Provides intelligent LLMs with structural APIs to interact with hundreds of everyday corporate SaaS tools.',
+                connections: ['hermes', 'linear', 'google_workspace', 'slack'],
+                action: 'Custom MCP Endpoint Suite',
+                actionDesc: 'Coded special Python endpoints to let agents safely run sensitive database edits after double-confirmation.'
+            },
+            {
+                id: 'aggregators', name: 'Aggregators', layer: 3, gridX: 2, gridZ: 1,
+                category: 'Brain & Models', type: 'Perplexity Pro & Monica', icon: 'fa-magnifying-glass-chart',
+                desc: 'Combines multiple web-grounding systems (Perplexity Pro / Monica) to perform lightning-fast market analysis, documentation research, and code verification.',
+                connections: ['closed_models', 'google_drive'],
+                action: 'Knowledge Graph Export API',
+                actionDesc: 'Configured automated export of complex web inquiries directly into your long-term memory stack in Markdown format.'
+            },
+
+            // Layer 2: Routers & Inference Layer (Y=0)
+            {
+                id: 'cerebras', name: 'Cerebras', layer: 2, gridX: -3, gridZ: -1,
+                category: 'Routers & Inference', type: 'Ultra-Low Latency Silicon', icon: 'fa-bolt-lightning',
+                desc: 'Specialized high-speed inference engine utilizing Wafer-Scale Engine hardware, providing virtually instantaneous token generation.',
+                connections: ['open_models', 'open_router'],
+                action: 'Agent Latency Compression',
+                actionDesc: 'Integrated Cerebras for conversational agents, bringing initial reaction times down to less than 110ms.'
+            },
+            {
+                id: 'groq', name: 'Groq', layer: 2, gridX: -1.5, gridZ: -1,
+                category: 'Routers & Inference', type: 'LPU Inference Engine', icon: 'fa-gauge-high',
+                desc: 'Language Processing Unit (LPU) architecture providing rapid model outputs for agent loops that require speedy iterative execution steps.',
+                connections: ['open_models', 'open_router'],
+                action: 'High-Speed Iterative Coding Loops',
+                actionDesc: 'Configured Groq as the primary processing engine for minor syntax checks and code compile confirmation loops.'
+            },
+            {
+                id: 'open_router', name: 'OpenRouter', layer: 2, gridX: 0.5, gridZ: -1,
+                category: 'Routers & Inference', type: 'Model Broker / Router', icon: 'fa-route',
+                desc: 'Unified endpoint router offering automated fallback, competitive tokens pricing, and easy scaling access to the latest open/closed LLM models.',
+                connections: ['closed_models', 'cerebras', 'groq'],
+                action: 'Failover Logic Integration',
+                actionDesc: 'Coded a dynamic wrapper. If a primary API provider times out twice, OpenRouter automatically swaps providers.'
+            },
+            {
+                id: 'ollama', name: 'Ollama', layer: 2, gridX: 2.5, gridZ: -1,
+                category: 'Routers & Inference', type: 'Local Model Hosting', icon: 'fa-server',
+                desc: 'Local inference engine running robustly on local systems, enabling secure offline processing for sensitive database operations.',
+                connections: ['open_models', 'offline_toshiba'],
+                action: 'Private Secure Network Setup',
+                actionDesc: 'Utilized Tailscale private network overlay to securely access local Ollama servers from Cloud instances.'
+            },
+
+            // Layer 1: Memory & Context Retrieval Layer (Y=-5)
+            {
+                id: 'obsidian', name: 'Obsidian Storage', layer: 1, gridX: -2.5, gridZ: 1,
+                category: 'Memory & Context', type: 'Logging / Retrieval / Vectoring', icon: 'fa-book-open',
+                desc: 'Local structured Markdown vault containing business logs, context blueprints, and agent vector databases. Serves as your absolute brain backup.',
+                connections: ['hermes', 'closed_models', 'google_drive', 'sqlite_local'],
+                action: 'RAG Pipeline & Embeddings (Added)',
+                actionDesc: 'Implemented Qdrant local embedding pipeline to turn plain Markdown notes into searchable semantic data.'
+            },
+            {
+                id: 'google_drive', name: 'Google Drive Sync', layer: 1, gridX: 0, gridZ: 1,
+                category: 'Memory & Context', type: 'Short & Mid-Level Folder Storage', icon: 'fa-cloud-arrow-up',
+                desc: 'Serves as the vital collaborative cloud fulcrum, managing file storage, dynamic document tracking, and secure corporate backups.',
+                connections: ['figma_canva', 'aggregators', 'obsidian', 'google_workspace'],
+                action: 'Automated Document Indexer',
+                actionDesc: 'Configured script that checks Google Drive for newly added files and automatically vectors them for agent access.'
+            },
+            {
+                id: 'offline_toshiba', name: 'Offline Toshiba Hard Drive', layer: 1, gridX: 2.5, gridZ: 1,
+                category: 'Memory & Context', type: 'Long-Term Secure Cold Storage', icon: 'fa-hard-drive',
+                desc: 'On-prem physical hardware designated for high-security, sensitive, and proprietary corporate assets, isolated completely from open networks.',
+                connections: ['open_models', 'ollama', 'sqlite_local'],
+                action: 'Encrypted Air-Gapped Sync',
+                actionDesc: 'Set up hardware key authorization system to sync logs securely when device is physically attached.'
+            },
+
+            // Layer 0: Infrastructure & Security Layer (Bottom Level Y=-10)
+            {
+                id: 'supabase', name: 'Supabase', layer: 0, gridX: -3, gridZ: -1,
+                category: 'Databases', type: 'Serverless PostgreSQL Stack', icon: 'fa-database',
+                desc: 'Comprehensive cloud database solution providing secure user authentication, real-time sync, and flexible relational data storage.',
+                connections: ['vercel', 'neon'],
+                action: 'Automatic Scaled Backups',
+                actionDesc: 'Configured weekly schema and asset snapshots directly exported onto your secure Google Drive repository.'
+            },
+            {
+                id: 'neon', name: 'Neon Postgres', layer: 0, gridX: -1, gridZ: -1,
+                category: 'Databases', type: 'Serverless Scalable Postgres', icon: 'fa-network-wired',
+                desc: 'Highly scalable relational database platform with native branch creation capabilities, allowing risk-free sandboxed testing cycles.',
+                connections: ['claude_code', 'supabase', 'vercel'],
+                action: 'Automatic GitHub Dev Branching',
+                actionDesc: 'Whenever a developer triggers a branch on GitHub, Neon automatically provisions a clean sandboxed database branch.'
+            },
+            {
+                id: 'sqlite_local', name: 'SQLite (Local DB)', layer: 0, gridX: 1, gridZ: -1,
+                category: 'Databases', type: 'Embeddable Local Database', icon: 'fa-file-shield',
+                desc: 'Embedded local database utilized to store rapid system logs, user access states, and fast vector arrays for offline operation.',
+                connections: ['obsidian', 'offline_toshiba'],
+                action: 'Secure Encryption Layer',
+                actionDesc: 'Implemented SQLite encryption extension (SQLCipher) to ensure zero-exposure of local cached data.'
+            },
+            {
+                id: 'github', name: 'GitHub Developer Suite', layer: 0, gridX: 3, gridZ: -1,
+                category: 'Hosting & Cloud', type: 'Version Control / Cloud Repo', icon: 'fa-github',
+                desc: 'Central command repository for code storage, collaborative management, security scans, and continuous integration pipelines.',
+                connections: ['claude_code', 'grok_build', 'vercel', 'cloudflare_security'],
+                action: 'Security & Access Control',
+                actionDesc: 'Configured automated action checks to prevent private deployment keys from ever being committed to repositories.'
+            },
+            {
+                id: 'vercel', name: 'Vercel Deployment Server', layer: 0, gridX: -2.5, gridZ: 2,
+                category: 'Hosting & Cloud', type: 'Edge Deployment / Cloud Hosting', icon: 'fa-cube',
+                desc: 'Global cloud edge network platform configured to build and serve high-performance customer-facing web applications with zero lag.',
+                connections: ['claude_code', 'supabase', 'neon', 'github', 'cloudflare_security'],
+                action: 'Global Edge Cache Routing',
+                actionDesc: 'Activated advanced global edge-caching protocols to dynamically serve web applications globally with latency lower than 12ms.'
+            },
+            {
+                id: 'cloudflare_security', name: 'Cloudflare Stack', layer: 0, gridX: 0, gridZ: 2,
+                category: 'Security & Cloud Network', type: 'DNS, Security, and WAF protection', icon: 'fa-shield-halved',
+                desc: 'Global Content Delivery Network, firewall, and DNS protection layer routing traffic safely, mitigating malicious activity and DDoS attacks.',
+                connections: ['github', 'vercel', 'crowdstrike'],
+                action: 'Web Application Firewall Config',
+                actionDesc: 'Set up advanced behavioral firewall rules blocking foreign automated scanners and spam scrapers immediately.'
+            },
+            {
+                id: 'crowdstrike', name: 'Crowdstrike Falcon', layer: 0, gridX: 2.5, gridZ: 2,
+                category: 'Security & Cloud Network', type: 'Endpoint Security / Threat Hunting', icon: 'fa-shield-cat',
+                desc: 'Enterprise-grade endpoint protection and telemetry monitoring for all cloud, agent host environments, and database networks.',
+                connections: ['cloudflare_security', 'google_workspace'],
+                action: 'Agent Security Telemetry (Added)',
+                actionDesc: 'Configured automated containment playbooks. If an agent script behaves unexpectedly, security limits contain the node.'
+            },
+            {
+                id: 'google_workspace', name: 'Google Workspace Stack', layer: 0, gridX: -0.5, gridZ: 3.5,
+                category: 'Integrations', type: 'Corporate Suite Integration', icon: 'fa-envelope-open-text',
+                desc: 'Corporate operations suite including Gmail, Calendar, Docs, and Admin. Fully synced with internal automations for communication flow.',
+                connections: ['zapier_mcp', 'google_drive', 'crowdstrike', 'slack'],
+                action: 'Gmail Notification Pipeline',
+                actionDesc: 'Formulated custom script that generates weekly workspace compliance summaries and emails them to managers automatically.'
+            },
+            {
+                id: 'slack', name: 'Slack Workplace Hub', layer: 0, gridX: 1.5, gridZ: 3.5,
+                category: 'Integrations', type: 'Workplace Messaging / Chat Ops', icon: 'fa-slack',
+                desc: 'Primary corporate communication hub, connected directly to operational channels to receive structural status updates and agent reports.',
+                connections: ['linear', 'zapier_mcp', 'google_workspace'],
+                action: 'Agent Log Broadcast Hub',
+                actionDesc: 'Integrated a dedicated Discord/Slack webhook dispatcher. System updates, successful builds, or failures alert the workspace instantly.'
+            }
+        ];
+
+        // -------------------------------------------------------------
+        // PREDEFINED PIPELINE SCENARIOS FOR SIMULATOR
+        // -------------------------------------------------------------
+        const pipelineScenarios = [
+            {
+                name: "Feature Rollout Blueprint",
+                desc: "An automated feature code expansion triggered, verified, built and deployed securely.",
+                path: ["zapier_mcp", "open_router", "claude_code", "github", "vercel", "neon"],
+                steps: [
+                    "Zapier MCP: Polls Linear ticket, triggers Feature Request.",
+                    "OpenRouter: Matches optimal low-cost model to outline logic.",
+                    "Claude Code: Writes node application update and initiates test runner.",
+                    "GitHub Suite: Merge request approved, security scanning complete.",
+                    "Vercel Server: Auto-builds application on edge servers.",
+                    "Neon Postgres: Live branching confirms zero database migrations conflict."
+                ]
+            },
+            {
+                name: "Client Agent Context Synapse",
+                desc: "An external complex task utilizing local vector search and lightning fast memory access.",
+                path: ["slack", "zapier_mcp", "hermes", "obsidian", "sqlite_local", "google_drive"],
+                steps: [
+                    "Slack: Client submits query via dedicated business integration channel.",
+                    "Zapier MCP: Validates query authenticity and formats inputs.",
+                    "Hermes Orchestrator: Receives formatted parameters and maps execution steps.",
+                    "Obsidian Storage: Searches vector database for relevant business context files.",
+                    "SQLite: Queries local index parameters to find user configuration records.",
+                    "Google Drive Sync: Retrieves reference document files and renders payload output."
+                ]
+            },
+            {
+                name: "Enterprise Threat & Secure Containment",
+                desc: "Anomalous user behavior detected, inspected, logged and defended through Cloud layers.",
+                path: ["crowdstrike", "cloudflare_security", "google_workspace", "obsidian", "offline_toshiba"],
+                steps: [
+                    "Crowdstrike Falcon: Spots malicious API brute forcing on public deployment endpoints.",
+                    "Cloudflare: Temporarily blacklists attacker IP and enforces strong captcha protection.",
+                    "Google Workspace: Alerts security administrator and triggers emergency auth key swap.",
+                    "Obsidian: Logs detailed security telemetry with localized incident reporting details.",
+                    "Offline Toshiba HD: Safely copies diagnostic logs to isolated physically secured backup folder."
+                ]
+            }
+        ];
+
+        let currentScenarioIndex = 0;
+        let isSimulating = false;
+        let simInterval = null;
+        let simStepIndex = 0;
+
+        // -------------------------------------------------------------
+        // THREE.JS IMPLEMENTATION
+        // -------------------------------------------------------------
+        let scene, camera, renderer, controls;
+        let nodesArray = [];
+        let connectionsArray = [];
+        let layerDiscsArray = [];
+        let raycaster, mouse;
+        let highlightedNode = null;
+        let selectedNodeId = null;
+
+        const layerHeightSpacing = 6; // Y axis distance between layers
+        const layerYOffsets = {
+            4: 12,  // Top
+            3: 6,   // Brains
+            2: 0,   // Inference
+            1: -6,  // Memory
+            0: -12  // Infrastructure
+        };
+
+        const categoryColors = {
+            'Agents': 0xf59e0b,                // Amber
+            'Design & Project Management': 0x10b981, // Emerald
+            'Brain & Models': 0xd946ef,         // Fuchsia
+            'Integrations & MCP': 0xa78bfa,     // Violet / Purple
+            'Routers & Inference': 0x6366f1,    // Indigo
+            'Memory & Context': 0x14b8a6,       // Teal
+            'Databases': 0x3b82f6,              // Blue
+            'Hosting & Cloud': 0x38bdf8,         // Sky Blue
+            'Security & Cloud Network': 0xef4444, // Red
+            'Integrations': 0xec4899            // Pink
+        };
+
+        const layersMetaData = {
+            4: { name: "1. Orchestration & Agents Stack", color: 0xf59e0b, y: 12 },
+            3: { name: "2. Brain & Cognitive Models Stack", color: 0xd946ef, y: 6 },
+            2: { name: "3. Routers & Inference Stack", color: 0x6366f1, y: 0 },
+            1: { name: "4. Memory & Context Retrieval", color: 0x14b8a6, y: -6 },
+            0: { name: "5. Persistence & Infrastructure", color: 0x3b82f6, y: -12 }
+        };
+
+        // Initialize Three Scene
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            
+            // Scene Setup
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x030012);
+            scene.fog = new THREE.FogExp2(0x030012, 0.025);
+
+            // Camera Setup
+            camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(22, 10, 26);
+
+            // Renderer Setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // Controls Setup
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1; // Limit panning too far below floor
+            controls.minDistance = 5;
+            controls.maxDistance = 60;
+
+            // Ambient & Directional Lights
+            const ambientLight = new THREE.AmbientLight(0x0e0a2b, 2.5);
+            scene.add(ambientLight);
+
+            const dirLight1 = new THREE.DirectionalLight(0x8b5cf6, 2.5);
+            dirLight1.position.set(20, 40, 20);
+            scene.add(dirLight1);
+
+            const dirLight2 = new THREE.DirectionalLight(0x06b6d4, 1.5);
+            dirLight2.position.set(-20, -10, -20);
+            scene.add(dirLight2);
+
+            // Grid Platforms representing the logical architecture stack levels
+            createLayerPlatforms();
+
+            // Render Nodes & Connecting Lines
+            createArchitectureNodes();
+            createInterNodeConnections();
+
+            // Interaction Setups
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            window.addEventListener('resize', onWindowResize);
+            container.addEventListener('mousemove', onMouseMove);
+            container.addEventListener('pointerdown', onDocumentMouseDown);
+            
+            // Start Loop
+            animate();
+        }
+
+        // Create Glowing Concentric Rings representing stack platforms
+        function createLayerPlatforms() {
+            for (let layerKey in layersMetaData) {
+                const layer = layersMetaData[layerKey];
+                const y = layer.y;
+
+                // Translucent platform geometry
+                const discGeom = new THREE.CylinderGeometry(8, 8, 0.1, 32);
+                const discMat = new THREE.MeshPhongMaterial({
+                    color: layer.color,
+                    transparent: true,
+                    opacity: 0.05,
+                    shininess: 40,
+                    specular: layer.color
+                });
+                const discMesh = new THREE.Mesh(discGeom, discMat);
+                discMesh.position.set(0, y, 0);
+                scene.add(discMesh);
+                layerDiscsArray.push(discMesh);
+
+                // Glow ring outline
+                const ringGeom = new THREE.RingGeometry(8, 8.1, 48);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: layer.color,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.25
+                });
+                const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+                ringMesh.rotation.x = Math.PI / 2;
+                ringMesh.position.set(0, y, 0);
+                scene.add(ringMesh);
+
+                // Grid lines inside the platform
+                const gridHelper = new THREE.GridHelper(16, 8, layer.color, 0x1d143c);
+                gridHelper.position.set(0, y, 0);
+                gridHelper.material.opacity = 0.15;
+                gridHelper.material.transparent = true;
+                scene.add(gridHelper);
+            }
+        }
+
+        // Render 3D geometric nodes representing each tool
+        function createArchitectureNodes() {
+            techStackData.forEach(node => {
+                const color = categoryColors[node.category] || 0xffffff;
+                const yPos = layerYOffsets[node.layer];
+
+                // Design 3D Geometry depending on component category for optimal UX visual cueing
+                let geometry;
+                if (node.category === 'Agents') {
+                    geometry = new THREE.IcosahedronGeometry(0.55, 1); // Complex polyhedral sphere for Agents
+                } else if (node.category === 'Brain & Models') {
+                    geometry = new THREE.OctahedronGeometry(0.5, 0); // Diamond look for models
+                } else if (node.category === 'Memory & Context') {
+                    geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8); // Robust box for storage nodes
+                } else if (node.category.includes('Security')) {
+                    geometry = new THREE.ConeGeometry(0.4, 0.8, 4); // Cyber shield cone
+                } else {
+                    geometry = new THREE.SphereGeometry(0.45, 16, 16); // Normal sphere for databases/hosting
+                }
+
+                // Node material with glassmorphism glow qualities
+                const material = new THREE.MeshPhongMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.45,
+                    shininess: 90,
+                    specular: 0xffffff,
+                    transparent: true,
+                    opacity: 0.95
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(node.gridX, yPos, node.gridZ);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+
+                // Add simple glow orbit rings around specific starred core elements
+                if (node.name.includes("Claude Code") || node.name.includes("Obsidian") || node.name.includes("GitHub") || node.name.includes("Zapier")) {
+                    const smallRingGeom = new THREE.RingGeometry(0.8, 0.85, 16);
+                    const smallRingMat = new THREE.MeshBasicMaterial({
+                        color: color,
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0.5
+                    });
+                    const smallRing = new THREE.Mesh(smallRingGeom, smallRingMat);
+                    smallRing.rotation.x = Math.PI / 2;
+                    mesh.add(smallRing);
+                }
+
+                // Keep references
+                mesh.userData = { id: node.id, nodeInfo: node };
+                scene.add(mesh);
+                nodesArray.push(mesh);
+            });
+        }
+
+        // Render data line pathways linking the multi-layer nodes
+        function createInterNodeConnections() {
+            connectionsArray.forEach(line => scene.remove(line));
+            connectionsArray = [];
+
+            techStackData.forEach(originNode => {
+                const originMesh = nodesArray.find(n => n.userData.id === originNode.id);
+                if (!originMesh) return;
+
+                originNode.connections.forEach(targetId => {
+                    const targetMesh = nodesArray.find(n => n.userData.id === targetId);
+                    if (!targetMesh) return;
+
+                    // Draw nice dynamic curves instead of stark lines for an impressive aesthetic
+                    const start = originMesh.position;
+                    const end = targetMesh.position;
+
+                    // Calculate midpoint to introduce a soft bend logic
+                    const midX = (start.x + end.x) / 2;
+                    const midY = (start.y + end.y) / 2 + (start.y === end.y ? 0 : 0.8);
+                    const midZ = (start.z + end.z) / 2;
+                    const mid = new THREE.Vector3(midX, midY, midZ);
+
+                    const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+                    const curvePoints = curve.getPoints(24);
+
+                    const lineGeom = new THREE.BufferGeometry().setFromPoints(curvePoints);
+                    
+                    // Simple path coloring: merge both origin and destination node colors
+                    const originCol = categoryColors[originNode.category];
+                    const targetCol = categoryColors[targetMesh.userData.nodeInfo.category];
+                    const colorLerp = new THREE.Color(originCol).lerp(new THREE.Color(targetCol), 0.5);
+
+                    const lineMat = new THREE.LineBasicMaterial({
+                        color: colorLerp,
+                        transparent: true,
+                        opacity: 0.15,
+                        linewidth: 1
+                    });
+
+                    const line = new THREE.Line(lineGeom, lineMat);
+                    line.userData = {
+                        originId: originNode.id,
+                        targetId: targetId,
+                        color: colorLerp
+                    };
+                    scene.add(line);
+                    connectionsArray.push(line);
+                });
+            });
+        }
+
+        // -------------------------------------------------------------
+        // ANIMATION LOOP & ROTATION MECHANICAL SETUP
+        // -------------------------------------------------------------
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Subtle rotation adjustments to the environment and active node elements
+            const time = Date.now() * 0.001;
+
+            nodesArray.forEach(mesh => {
+                // Pulse size fluctuation very gently
+                const pulse = 1 + Math.sin(time * 2 + mesh.position.x) * 0.03;
+                mesh.scale.set(pulse, pulse, pulse);
+
+                // Rotate Agent polyhedrals and model shapes at different speeds
+                if (mesh.userData.nodeInfo.category === 'Agents') {
+                    mesh.rotation.y += 0.006;
+                } else if (mesh.userData.nodeInfo.category === 'Brain & Models') {
+                    mesh.rotation.x += 0.004;
+                    mesh.rotation.z += 0.003;
+                } else {
+                    mesh.rotation.y += 0.002;
+                }
+            });
+
+            // Rotate outer glow rings
+            layerDiscsArray.forEach((disc, index) => {
+                disc.rotation.y = Math.sin(time * 0.1 + index) * 0.15;
+            });
+
+            // Smooth camera transition if focused on specific coordinates
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Adjust Canvas on screen dimensions updates
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // Handle Hover States for visual highlighting feedback
+        function onMouseMove(event) {
+            const container = document.getElementById('canvas-container');
+            const rect = renderer.domElement.getBoundingClientRect();
+            
+            // Normalized coordinates mapping
+            mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(nodesArray);
+
+            if (intersects.length > 0) {
+                document.getElementById('canvas-container').style.cursor = 'pointer';
+                const nodeMesh = intersects[0].object;
+
+                if (highlightedNode !== nodeMesh) {
+                    // Reset old highlighted node emissive factor
+                    if (highlightedNode) {
+                        const baseColor = categoryColors[highlightedNode.userData.nodeInfo.category];
+                        highlightedNode.material.emissive.setHex(baseColor);
+                        highlightedNode.material.emissiveIntensity = 0.45;
+                    }
+
+                    // Intense highlight on current node
+                    highlightedNode = nodeMesh;
+                    highlightedNode.material.emissive.setHex(0xffffff);
+                    highlightedNode.material.emissiveIntensity = 0.8;
+                }
+            } else {
+                document.getElementById('canvas-container').style.cursor = 'grab';
+                if (highlightedNode) {
+                    const baseColor = categoryColors[highlightedNode.userData.nodeInfo.category];
+                    highlightedNode.material.emissive.setHex(baseColor);
+                    highlightedNode.material.emissiveIntensity = 0.45;
+                    highlightedNode = null;
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // NODE SELECTION & SIDEBAR POPULATOR
+        // -------------------------------------------------------------
+        function onDocumentMouseDown(event) {
+            // Check if click was a clean touch/click on node meshes
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(nodesArray);
+
+            if (intersects.length > 0) {
+                const clickedMesh = intersects[0].object;
+                selectNode(clickedMesh.userData.id);
+                
+                // Play audio click response safely
+                const audio = document.getElementById('clickSound');
+                if (audio) {
+                    audio.volume = 0.25;
+                    audio.play().catch(() => {}); // catch programmatic block browser issues
+                }
+            }
+        }
+
+        // Highlight and focus on specific node ID
+        function selectNode(nodeId) {
+            selectedNodeId = nodeId;
+            const nodeMesh = nodesArray.find(n => n.userData.id === nodeId);
+            if (!nodeMesh) return;
+
+            const node = nodeMesh.userData.nodeInfo;
+
+            // Highlight node visually
+            nodesArray.forEach(mesh => {
+                const baseColor = categoryColors[mesh.userData.nodeInfo.category];
+                mesh.material.emissive.setHex(baseColor);
+                mesh.material.opacity = 0.35; // Dim others
+            });
+            nodeMesh.material.emissive.setHex(0xffffff);
+            nodeMesh.material.opacity = 1.0;
+
+            // Highlight connections pathways specifically linked to node
+            connectionsArray.forEach(line => {
+                if (line.userData.originId === nodeId || line.userData.targetId === nodeId) {
+                    line.material.opacity = 0.9;
+                    line.material.linewidth = 2;
+                } else {
+                    line.material.opacity = 0.03;
+                }
+            });
+
+            // Smooth camera transition directly focus toward node coordinate offsets
+            const targetPos = new THREE.Vector3();
+            nodeMesh.getWorldPosition(targetPos);
+            
+            // Adjust camera look target smoothly
+            const offset = new THREE.Vector3(7, 3, 7);
+            const targetCamPos = targetPos.clone().add(offset);
+
+            // Animate properties using custom tween step
+            let step = 0;
+            const maxSteps = 25;
+            function lerpCamera() {
+                if (step < maxSteps) {
+                    camera.position.lerp(targetCamPos, 0.12);
+                    controls.target.lerp(targetPos, 0.12);
+                    step++;
+                    requestAnimationFrame(lerpCamera);
+                }
+            }
+            lerpCamera();
+
+            // Populate Sidebar Drawer UI Elements beautifully
+            document.getElementById('nodeTitle').innerText = node.name;
+            document.getElementById('nodeCategory').innerText = node.category;
+            document.getElementById('nodeType').innerText = node.type;
+            document.getElementById('nodeDesc').innerText = node.desc;
+            document.getElementById('chatSelectedNodeName').innerText = node.name;
+
+            // Dynamically set category icon inside detail drawer header
+            const iconBox = document.getElementById('nodeIconBox');
+            iconBox.innerHTML = `<i class="fa-solid ${node.icon}"></i>`;
+            
+            // Color code the sidebar header specifically
+            const colorHex = '#' + categoryColors[node.category].toString(16).padStart(6, '0');
+            iconBox.style.color = colorHex;
+            iconBox.style.borderColor = colorHex + '50';
+            iconBox.style.backgroundColor = colorHex + '15';
+
+            // Connect Connections tags UI
+            const connectionBox = document.getElementById('nodeConnections');
+            connectionBox.innerHTML = '';
+            
+            node.connections.forEach(connId => {
+                const connectedInfo = techStackData.find(t => t.id === connId);
+                if (connectedInfo) {
+                    const tagCol = '#' + categoryColors[connectedInfo.category].toString(16).padStart(6, '0');
+                    const span = document.createElement('span');
+                    span.className = 'text-[10px] px-2.5 py-1 rounded-lg border flex items-center gap-1.5 cursor-pointer hover:bg-violet-500/10 transition duration-150 font-medium';
+                    span.style.color = tagCol;
+                    span.style.borderColor = tagCol + '30';
+                    span.style.backgroundColor = tagCol + '10';
+                    span.innerHTML = `<i class="fa-solid ${connectedInfo.icon} text-[8px]"></i> ${connectedInfo.name}`;
+                    span.onclick = () => selectNode(connId);
+                    connectionBox.appendChild(span);
+                }
+            });
+
+            // Build Optimization Improvement Data Action Block
+            document.getElementById('actionTitle').innerText = node.action;
+            document.getElementById('actionDesc').innerText = node.actionDesc;
+
+            // Remove instructions overlay once interacting
+            const instructionOverlay = document.getElementById('instructionOverlay');
+            if (instructionOverlay) {
+                instructionOverlay.style.opacity = '0';
+                setTimeout(() => instructionOverlay.remove(), 600);
+            }
+
+            // Open the detail drawer securely
+            const drawerBody = document.getElementById('drawerBody');
+            const drawer = document.getElementById('nodeDetailDrawer');
+            drawer.style.pointerEvents = 'auto';
+            drawerBody.classList.remove('translate-x-full');
+            
+            // Adjust active status highlighting in layers explorer drawer
+            highlightLayerMenu(node.layer);
+
+            // Populate baseline message inside advisor chat box contextually
+            const chatHistory = document.getElementById('advisorChatHistory');
+            chatHistory.innerHTML = `
+                <div class="bg-violet-950/20 border border-violet-500/10 p-2.5 rounded-xl text-xs text-gray-300">
+                    <span class="font-bold text-violet-400 block mb-0.5">✨ Gemini Advisor:</span>
+                    Hello! I have loaded the live architecture context for the <b class="text-violet-200 font-bold">${node.name}</b> component. Ask me how to construct API triggers, set up RAG, or improve enterprise scale.
+                </div>
+            `;
+        }
+
+        // Highlight selected layer inside left panel menu list
+        function highlightLayerMenu(layerIndex) {
+            for (let i = 0; i <= 4; i++) {
+                const btn = document.getElementById(`layerBtn-${i}`);
+                if (btn) {
+                    if (i === parseInt(layerIndex)) {
+                        btn.classList.add('active-tab');
+                        btn.classList.remove('text-violet-300/80');
+                    } else {
+                        btn.classList.remove('active-tab');
+                        btn.classList.add('text-violet-300/80');
+                    }
+                }
+            }
+        }
+
+        // Close sidebar utility
+        function closeDrawer() {
+            const drawerBody = document.getElementById('drawerBody');
+            const drawer = document.getElementById('nodeDetailDrawer');
+            drawer.style.pointerEvents = 'none';
+            drawerBody.classList.add('translate-x-full');
+
+            // Reset standard node opacities/connection line states
+            nodesArray.forEach(mesh => {
+                const baseColor = categoryColors[mesh.userData.nodeInfo.category];
+                mesh.material.emissive.setHex(baseColor);
+                mesh.material.opacity = 0.95;
+            });
+            connectionsArray.forEach(line => {
+                line.material.opacity = 0.15;
+                line.material.linewidth = 1;
+            });
+
+            // De-select layer buttons highlights
+            for (let i = 0; i <= 4; i++) {
+                document.getElementById(`layerBtn-${i}`).classList.remove('active-tab');
+            }
+        }
+
+        // Reset Camera back to initial coordinates overview
+        function resetCamera() {
+            closeDrawer();
+            
+            const startCamPos = new THREE.Vector3(22, 10, 26);
+            const startTarget = new THREE.Vector3(0, 0, 0);
+
+            let step = 0;
+            const maxSteps = 30;
+            function lerpReset() {
+                if (step < maxSteps) {
+                    camera.position.lerp(startCamPos, 0.12);
+                    controls.target.lerp(startTarget, 0.12);
+                    step++;
+                    requestAnimationFrame(lerpReset);
+                } else {
+                    camera.position.copy(startCamPos);
+                    controls.target.copy(startTarget);
+                }
+            }
+            lerpReset();
+        }
+
+        // Focus and pan on selected Layer disc elevation
+        function focusLayer(layerIndex) {
+            const yOffset = layerYOffsets[layerIndex];
+            
+            const targetPos = new THREE.Vector3(0, yOffset, 0);
+            const offset = new THREE.Vector3(18, 5, 18);
+            const targetCamPos = targetPos.clone().add(offset);
+
+            let step = 0;
+            const maxSteps = 25;
+            function lerpLayer() {
+                if (step < maxSteps) {
+                    camera.position.lerp(targetCamPos, 0.12);
+                    controls.target.lerp(targetPos, 0.12);
+                    step++;
+                    requestAnimationFrame(lerpLayer);
+                }
+            }
+            lerpLayer();
+
+            highlightLayerMenu(layerIndex);
+
+            // Highlight all nodes located on this specific layer
+            nodesArray.forEach(mesh => {
+                if (mesh.userData.nodeInfo.layer === parseInt(layerIndex)) {
+                    mesh.material.opacity = 1.0;
+                    mesh.material.emissive.setHex(0xffffff);
+                } else {
+                    mesh.material.opacity = 0.15;
+                    const baseCol = categoryColors[mesh.userData.nodeInfo.category];
+                    mesh.material.emissive.setHex(baseCol);
+                }
+            });
+
+            // Mute connection lines except those that link nodes within same active layer
+            connectionsArray.forEach(line => {
+                const origNode = techStackData.find(t => t.id === line.userData.originId);
+                const targetNode = techStackData.find(t => t.id === line.userData.targetId);
+                if (origNode && targetNode && origNode.layer === layerIndex && targetNode.layer === layerIndex) {
+                    line.material.opacity = 0.8;
+                } else {
+                    line.material.opacity = 0.02;
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // AUTOMATED WORKFLOW SIMULATION SYSTEM
+        // -------------------------------------------------------------
+        function togglePipelineSim() {
+            const simBtn = document.getElementById('simBtn');
+            const simPanel = document.getElementById('simulationPanel');
+
+            if (isSimulating) {
+                // Halt Active Simulation
+                isSimulating = false;
+                clearInterval(simInterval);
+                simInterval = null;
+                
+                simBtn.classList.remove('bg-emerald-500', 'text-slate-950');
+                simBtn.classList.add('bg-emerald-950/40', 'text-emerald-300');
+                simBtn.innerHTML = `<i class="fa-solid fa-circle-play animate-pulse"></i> <span>Simulate Flow</span>`;
+                
+                simPanel.style.opacity = '0';
+                simPanel.style.pointerEvents = 'none';
+                simPanel.classList.add('translate-y-4');
+
+                // Restore node values back to original properties
+                closeDrawer();
+            } else {
+                // Initialize Simulation Setup
+                isSimulating = true;
+                simStepIndex = 0;
+
+                simBtn.classList.add('bg-emerald-500', 'text-slate-950');
+                simBtn.classList.remove('bg-emerald-950/40', 'text-emerald-300');
+                simBtn.innerHTML = `<i class="fa-solid fa-circle-pause"></i> <span>Stop Simulation</span>`;
+
+                simPanel.style.opacity = '1';
+                simPanel.style.pointerEvents = 'auto';
+                simPanel.classList.remove('translate-y-4');
+
+                // Initialize first scenario
+                runCurrentScenario();
+            }
+        }
+
+        function runCurrentScenario() {
+            const scenario = pipelineScenarios[currentScenarioIndex];
+            document.getElementById('simName').innerText = scenario.name;
+            document.getElementById('simDesc').innerText = scenario.desc;
+
+            // Render out dynamic step structure blocks on left-panel overlay
+            const stepsContainer = document.getElementById('simStepsContainer');
+            stepsContainer.innerHTML = '';
+            
+            scenario.steps.forEach((stepText, idx) => {
+                const nodeKey = scenario.path[idx];
+                const stepDiv = document.createElement('div');
+                stepDiv.id = `step${idx+1}`;
+                stepDiv.className = `flex items-center gap-2 text-[10px] mono ${idx === 0 ? '' : 'opacity-40'} transition-all duration-300`;
+                stepDiv.innerHTML = `
+                    <span class="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">${idx+1}</span>
+                    <span class="text-gray-300">${stepText}</span>
+                `;
+                stepsContainer.appendChild(stepDiv);
+            });
+
+            // Fire running cycle intervals
+            clearInterval(simInterval);
+            simStepIndex = 0;
+            
+            runStep();
+            simInterval = setInterval(runStep, 3500);
+        }
+
+        function runStep() {
+            const scenario = pipelineScenarios[currentScenarioIndex];
+            const stepsCount = scenario.path.length;
+
+            if (simStepIndex >= stepsCount) {
+                // Loop Scenario Step or stay at final
+                simStepIndex = 0;
+                // Reset step list opacity
+                for (let i = 1; i <= stepsCount; i++) {
+                    const stepEl = document.getElementById(`step${i}`);
+                    if (stepEl) {
+                        stepEl.classList.add('opacity-40');
+                        stepEl.classList.remove('text-emerald-300', 'font-bold', 'translate-x-1');
+                    }
+                }
+            }
+
+            const currentActiveNodeId = scenario.path[simStepIndex];
+            
+            // Visually trigger simulation step highlights
+            selectNode(currentActiveNodeId);
+
+            // Highlight step text in list drawer panel
+            const currentStepEl = document.getElementById(`step${simStepIndex + 1}`);
+            if (currentStepEl) {
+                currentStepEl.classList.remove('opacity-40');
+                currentStepEl.classList.add('text-emerald-300', 'font-bold', 'translate-x-1');
+                currentStepEl.querySelector('span:nth-child(1)').classList.add('bg-emerald-500');
+                
+                // Set step action text description dynamically
+                document.getElementById('simDesc').innerText = scenario.steps[simStepIndex];
+            }
+
+            // Increment scenario execution cursor
+            simStepIndex++;
+        }
+
+        function cyclePipeline() {
+            currentScenarioIndex = (currentScenarioIndex + 1) % pipelineScenarios.length;
+            runCurrentScenario();
+        }
+
+        // -------------------------------------------------------------
+        // TAB SWAP CONTROLLERS
+        // -------------------------------------------------------------
+        function switchLeftTab(tabId) {
+            const tabLayers = document.getElementById('leftTab-layers');
+            const tabGemini = document.getElementById('leftTab-gemini');
+            const btnLayers = document.getElementById('tabBtn-layers');
+            const btnGemini = document.getElementById('tabBtn-gemini');
+
+            if (tabId === 'layers') {
+                tabLayers.classList.remove('hidden');
+                tabGemini.classList.add('hidden');
+                btnLayers.classList.add('active-tab');
+                btnLayers.classList.remove('text-violet-300/60');
+                btnGemini.classList.remove('active-tab');
+                btnGemini.classList.add('text-violet-300/60');
+            } else {
+                tabLayers.classList.add('hidden');
+                tabGemini.classList.remove('hidden');
+                btnGemini.classList.add('active-tab');
+                btnGemini.classList.remove('text-violet-300/60');
+                btnLayers.classList.remove('active-tab');
+                btnLayers.classList.add('text-violet-300/60');
+            }
+        }
+
+        function switchNodeSubTab(tabId) {
+            const tabSpec = document.getElementById('nodeSubTab-spec');
+            const tabConsult = document.getElementById('nodeSubTab-consult');
+            const btnSpec = document.getElementById('nodeSubTabBtn-spec');
+            const btnConsult = document.getElementById('nodeSubTabBtn-consult');
+
+            if (tabId === 'spec') {
+                tabSpec.classList.remove('hidden');
+                tabConsult.classList.add('hidden');
+                btnSpec.classList.add('bg-violet-500/15', 'border-violet-500/20', 'text-white');
+                btnSpec.classList.remove('text-violet-300/60');
+                btnConsult.classList.remove('bg-violet-500/15', 'border-violet-500/20', 'text-white');
+                btnConsult.classList.add('text-violet-300/60');
+            } else {
+                tabSpec.classList.add('hidden');
+                tabConsult.classList.remove('hidden');
+                btnConsult.classList.add('bg-violet-500/15', 'border-violet-500/20', 'text-white');
+                btnConsult.classList.remove('text-violet-300/60');
+                btnSpec.classList.remove('bg-violet-500/15', 'border-violet-500/20', 'text-white');
+                btnSpec.classList.add('text-violet-300/60');
+            }
+        }
+
+
+        // -------------------------------------------------------------
+        // GEMINI API CALL (EXPONENTIAL BACKOFF IMPLEMENTATION)
+        // -------------------------------------------------------------
+        async function fetchGeminiAPI(payload, retries = 5, delay = 1000) {
+            const apiKey = ""; // Runtime environments inject key here
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Gemini API Error (status ${response.status})`);
+                }
+                return await response.json();
+            } catch (error) {
+                if (retries > 0) {
+                    // Exponential Backoff Delay
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchGeminiAPI(payload, retries - 1, delay * 2);
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // ✨ GEMINI OPERATION 1: WORKFLOW SYNTHESIZER
+        // -------------------------------------------------------------
+        async function synthesizePipeline() {
+            const promptInput = document.getElementById('geminiPromptInput');
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showGeminiAlert("Please Enter a Scenario", "Describe what custom flow you want Gemini to analyze and build.", "error");
+                return;
+            }
+
+            // Lock synthesis button state
+            setSynthesisBtnState(true);
+            showGeminiAlert("Analyzing Nodes & Physics...", "Consulting Gemini 2.5-Flash to route optimal architecture path steps.", "loading");
+
+            // Define node database identifiers for prompt safety rules
+            const availableNodes = techStackData.map(node => `"${node.id}" (${node.name} under layer ${node.layer})`).join(", ");
+
+            const systemPrompt = `You are the lead Systems Architect at MAB AI STRATEGIES.
+Your task is to analyze a user's corporate automation query and synthesize an interactive 3D pipeline trajectory using only valid nodes from our system.
+
+VALID NODES IN INVENTORY:
+[${availableNodes}]
+
+Return a structured JSON object with the following properties:
+1. "name" (string): Concise title of the business scenario (e.g., "Air-Gapped Sync Sequence").
+2. "desc" (string): Summary description of the operations.
+3. "path" (array of strings): Exactly 4 to 6 connected node IDs sequentially ordered, demonstrating the data path (e.g., ["slack", "zapier_mcp", "claude_code", "github", "vercel"]). Must use the exact literal string IDs from our inventory list only.
+4. "steps" (array of strings): Exactly the same number of step descriptions matching each node in the path sequence. Keep descriptions short and highly technical.
+
+Output MUST be valid JSON adhering exactly to the schema. Do not output markdown surrounding blocks.`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: `Generate a custom scenario pipeline for this prompt: "${prompt}"` }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            name: { type: "STRING" },
+                            desc: { type: "STRING" },
+                            path: {
+                                type: "ARRAY",
+                                items: { type: "STRING" }
+                            },
+                            steps: {
+                                type: "ARRAY",
+                                items: { type: "STRING" }
+                            }
+                        },
+                        required: ["name", "desc", "path", "steps"]
+                    }
+                }
+            };
+
+            try {
+                const data = await fetchGeminiAPI(payload);
+                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawText) {
+                    throw new Error("Empty model response received.");
+                }
+
+                const parsedScenario = JSON.parse(rawText);
+                
+                // Validate node matching safety rules to protect ThreeJS execution arrays
+                const validPaths = parsedScenario.path.filter(nodeId => techStackData.some(node => node.id === nodeId));
+                
+                if (validPaths.length < 2) {
+                    throw new Error("Gemini couldn't align enough valid physical nodes to construct a trajectory.");
+                }
+
+                // Append the generated scenario directly onto the simulation inventory lists
+                parsedScenario.path = validPaths;
+                pipelineScenarios.push(parsedScenario);
+                currentScenarioIndex = pipelineScenarios.length - 1;
+
+                // Stop any current running simulations and boot up the newly generated one
+                isSimulating = false;
+                togglePipelineSim(); // Turns simulation ON running the fresh pipeline scenario
+
+                showGeminiAlert("Simulation Constructed! ✨", "Watch the 3D grid layout light up dynamically as Gemini executes each step.", "success");
+                
+                // Switch view automatically to show active simulation elements
+                setTimeout(() => {
+                    hideGeminiAlert();
+                }, 4000);
+
+            } catch (err) {
+                console.error("Synthesizer failure:", err);
+                showGeminiAlert("Architecture Check Failed", err.message || "An error occurred during system compilation.", "error");
+            } finally {
+                setSynthesisBtnState(false);
+            }
+        }
+
+        // Helper interface triggers
+        function showGeminiAlert(title, text, type) {
+            const alertDiv = document.getElementById('geminiAlert');
+            const alertTitle = document.getElementById('geminiAlertTitle');
+            const alertDesc = document.getElementById('geminiAlertDesc');
+            const alertSpinner = document.getElementById('geminiAlertSpinner');
+
+            alertDiv.classList.remove('hidden', 'bg-indigo-950/40', 'border-indigo-500/30', 'bg-rose-950/30', 'border-rose-500/30', 'bg-emerald-950/30', 'border-emerald-500/30');
+            alertSpinner.classList.remove('hidden');
+
+            if (type === "loading") {
+                alertDiv.classList.add('bg-indigo-950/40', 'border-indigo-500/30');
+            } else if (type === "error") {
+                alertDiv.classList.add('bg-rose-950/30', 'border-rose-500/30');
+                alertSpinner.classList.add('hidden');
+            } else if (type === "success") {
+                alertDiv.classList.add('bg-emerald-950/30', 'border-emerald-500/30');
+                alertSpinner.classList.add('hidden');
+            }
+
+            alertTitle.innerText = title;
+            alertDesc.innerText = text;
+            alertDiv.classList.remove('hidden');
+        }
+
+        function hideGeminiAlert() {
+            document.getElementById('geminiAlert').classList.add('hidden');
+        }
+
+        function setSynthesisBtnState(isLoading) {
+            const btn = document.getElementById('synthesizeBtn');
+            const btnText = document.getElementById('synthesizeBtnText');
+            const icon = document.getElementById('synthesizeIcon');
+
+            if (isLoading) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btnText.innerText = "Synthesizing Node Geometry...";
+                icon.className = "fa-solid fa-spinner animate-spin";
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnText.innerText = "✨ Design & Generate 3D Sim";
+                icon.className = "fa-solid fa-microchip";
+            }
+        }
+
+        // -------------------------------------------------------------
+        // ✨ GEMINI OPERATION 2: CONTEXTUAL STACK ADVISOR CHAT
+        // -------------------------------------------------------------
+        async function sendAdvisorMessage() {
+            const chatInput = document.getElementById('advisorChatInput');
+            const query = chatInput.value.trim();
+            if (!query) return;
+
+            // Fetch info on currently highlighted/focused Node
+            const targetNodeInfo = techStackData.find(t => t.id === selectedNodeId) || techStackData[1]; // fallback to Claude Code
+
+            // Append user bubble to chat history panel
+            const chatHistory = document.getElementById('advisorChatHistory');
+            const userMsgDiv = document.createElement('div');
+            userMsgDiv.className = "bg-violet-950/40 border border-violet-500/5 p-2 rounded-xl text-xs text-violet-100 self-end max-w-[90%]";
+            userMsgDiv.innerHTML = `<span class="font-bold text-violet-300 block mb-0.5">You:</span> ${query}`;
+            chatHistory.appendChild(userMsgDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            chatInput.value = '';
+
+            // Add loading indicator block for Gemini advisor bubble
+            const loadingMsgDiv = document.createElement('div');
+            loadingMsgDiv.className = "bg-[#0b0525] border border-violet-500/10 p-2.5 rounded-xl text-xs text-gray-400";
+            loadingMsgDiv.innerHTML = `
+                <span class="font-bold text-violet-400 flex items-center gap-1.5 mb-0.5">
+                    <i class="fa-solid fa-spinner animate-spin text-[10px]"></i> Gemini is analyzing component integration docs...
+                </span>
+            `;
+            chatHistory.appendChild(loadingMsgDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Prepare Gemini payload
+            const activeStackLayoutJSON = JSON.stringify(targetNodeInfo);
+
+            const systemPrompt = `You are a world-class AI Architecture Consultant for MAB AI STRATEGIES.
+The user is inspecting a interactive 3D technical stack wireframe app and is seeking high-level professional guidance regarding a specific active component node:
+
+CURRENT INSPECTED COMPONENT DETAILS:
+${activeStackLayoutJSON}
+
+Deliver a highly technical, precise answer explaining how to integrate, configure, or enhance this specific component. 
+Include short code snippets or config templates (e.g. CLI commands, Docker compose setups, or TypeScript SDK code) where useful. 
+Keep answers concise, direct, formatting math equations in LaTeX syntax if any, and write beautifully in Markdown format.`;
+
+            const payload = {
+                contents: [{
+                    parts: [{ text: query }]
+                }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            try {
+                const data = await fetchGeminiAPI(payload);
+                const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No reply generated. Double check system logs.";
+
+                // Remove loading indicator bubble
+                chatHistory.removeChild(loadingMsgDiv);
+
+                // Print out reply with a cute formatted markdown layout
+                const aiMsgDiv = document.createElement('div');
+                aiMsgDiv.className = "bg-[#0c0628] border border-violet-500/10 p-2.5 rounded-xl text-xs text-gray-200 leading-relaxed";
+                aiMsgDiv.innerHTML = `<span class="font-bold text-violet-400 block mb-1">✨ Gemini Advisor:</span> ${parseMarkdown(replyText)}`;
+                chatHistory.appendChild(aiMsgDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            } catch (err) {
+                console.error("Advisor chat failure:", err);
+                chatHistory.removeChild(loadingMsgDiv);
+
+                const errMsgDiv = document.createElement('div');
+                errMsgDiv.className = "bg-rose-950/20 border border-rose-500/30 p-2.5 rounded-xl text-xs text-rose-300";
+                errMsgDiv.innerHTML = `<span class="font-bold block mb-0.5">System Error:</span> Could not contact advisor endpoints. Please try again.`;
+                chatHistory.appendChild(errMsgDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+        }
+
+        // Extremely simplified client-side Markdown parser to format advisor outputs
+        function parseMarkdown(text) {
+            // Replace backticks with mono tags
+            text = text.replace(/`([^`]+)`/g, '<code class="mono bg-[#1b123c] px-1 py-0.5 rounded text-violet-300">$1</code>');
+            // Bold tag formatting
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            // Bullet list formatting
+            text = text.replace(/^\s*[-*]\s+(.*)$/gm, '<li class="ml-4 list-disc">$1</li>');
+            // Handle basic multi-line code blocks nicely
+            text = text.replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre class="mono bg-[#030012] p-2 rounded-lg my-1.5 overflow-x-auto text-[10px] text-violet-200 border border-violet-500/10">$2</pre>');
+            return text;
+        }
+
+
+        // -------------------------------------------------------------
+        // APPLICATION RUNNING BOOTSTRAP INITIALIZATION
+        // -------------------------------------------------------------
+        window.onload = function () {
+            // Initiate ThreeJS Graphics Engine
+            initThree();
+
+            // Set up active connection configurations to avoid initial empty panels
+            setTimeout(() => {
+                // Pre-highlight an awesome center agent to set the premium atmosphere stage
+                selectNode('claude_code');
+            }, 600);
+        };
+    </script>
+</body>
+</html>
